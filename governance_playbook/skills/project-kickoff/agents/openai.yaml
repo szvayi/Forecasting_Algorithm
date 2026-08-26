@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Kickoff"
+  short_description: "跨项目会话开场：对齐MVP里程碑、任务分配与风险"
+  default_prompt: "Use $project-kickoff to scan this workspace, report MVP milestone status, and propose role-based task assignment before execution."

@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Review · SPU MVP</title>
+    <style>
+        :root {
+            --bg: #f6f7f9;
+            --surface: #ffffff;
+            --border: #e5e7eb;
+            --text: #111827;
+            --muted: #6b7280;
+            --primary: #1f5eff;
+            --primary-strong: #1648d8;
+            --success: #0f9d58;
+            --warning: #d97706;
+            --radius: 14px;
+            --shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            color: var(--text);
+            background: var(--bg);
+            font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+        }
+
+        .page {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 28px;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-start;
+            margin-bottom: 18px;
+        }
+
+        .eyebrow {
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 { margin: 0; font-size: 34px; }
+        .subtitle { margin: 8px 0 0; color: var(--muted); }
+
+        .status-chip {
+            border: 1px solid var(--border);
+            background: var(--surface);
+            border-radius: 999px;
+            padding: 8px 12px;
+            font-weight: 600;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 18px;
+        }
+
+        .card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .card-head h2 { margin: 0; font-size: 20px; }
+        .card-head a { color: var(--primary); text-decoration: none; font-weight: 600; }
+
+        .badge {
+            background: rgba(31, 94, 255, 0.1);
+            color: var(--primary);
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .field { display: block; margin-bottom: 12px; }
+        .field span { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
+        select, textarea {
+            width: 100%;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px 12px;
+            background: #fff;
+            font: inherit;
+        }
+
+        textarea { min-height: 90px; resize: vertical; }
+
+        .tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .tab {
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            border-color: rgba(31, 94, 255, 0.4);
+            color: var(--primary);
+            font-weight: 700;
+            background: rgba(31, 94, 255, 0.05);
+        }
+
+        .hint { margin: 8px 0 10px; color: var(--muted); font-size: 13px; }
+        .hidden { display: none; }
+
+        .btn-row { display: flex; gap: 10px; margin-top: 10px; }
+
+        .btn {
+            border: 0;
+            border-radius: 10px;
+            padding: 10px 12px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .btn.primary { background: var(--primary); color: #fff; }
+        .btn.primary:hover { background: var(--primary-strong); }
+        .btn.secondary { background: #eef2ff; color: var(--primary); }
+        .btn.ghost { background: #f3f4f6; color: var(--text); margin-top: 10px; }
+
+        .preview {
+            margin-top: 14px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .preview-head { display: flex; justify-content: space-between; margin-bottom: 8px; }
+        .pills { display: flex; flex-wrap: wrap; gap: 6px; }
+        .pills span {
+            background: #eef2ff;
+            color: var(--primary);
+            border-radius: 999px;
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .run-state {
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .run-state.running {
+            background: rgba(217, 119, 6, 0.1);
+            color: var(--warning);
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .metrics article {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .metrics p { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+        .metrics strong { font-size: 22px; }
+
+        .bar-wrap {
+            margin: 12px 0 14px;
+            height: 10px;
+            border-radius: 999px;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .bar {
+            width: 62%;
+            height: 100%;
+            background: linear-gradient(90deg, #1f5eff, #3b82f6);
+        }
+
+        .split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .panel {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .panel h3 { margin: 0 0 8px; font-size: 15px; }
+        .panel ul { margin: 0; padding-left: 20px; }
+        .panel li { margin: 4px 0; }
+        .warn { margin: 0; color: #b45309; }
+
+        .result-log-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 10px;
+        }
+
+        .result-log-grid article {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .result-log-grid p { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+
+        .summary-kpis {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .summary-kpis .kpi {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .summary-kpis .kpi p {
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .summary-kpis .kpi strong { font-size: 20px; }
+
+        .mini-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .mini-table th,
+        .mini-table td {
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            padding: 8px 0;
+        }
+
+        .mini-table th { color: var(--muted); font-weight: 600; }
+
+        .log-box {
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #0f172a;
+            color: #dbe5ff;
+            padding: 12px;
+            min-height: 240px;
+            max-height: 300px;
+            overflow: auto;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .log-line { margin-bottom: 8px; }
+        .log-time { color: #93c5fd; margin-right: 8px; }
+
+        @media (max-width: 900px) {
+            .page { padding: 16px; }
+            .layout { grid-template-columns: 1fr; }
+            .split { grid-template-columns: 1fr; }
+            .result-log-grid { grid-template-columns: 1fr; }
+            .summary-kpis { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">Design Review Draft</p>
+                <h1>SPU MVP 执行平台</h1>
+                <p class="subtitle">欧美大品牌风格 · 极简配色 · 一屏理解，两步操作</p>
+            </div>
+            <div class="status-chip">评审稿 v1</div>
+        </header>
+
+        <main class="layout">
+            <section class="card">
+                <div class="card-head">
+                    <h2>1. 任务发起</h2>
+                    <span class="badge">主路径</span>
+                </div>
+                <label class="field">
+                    <span>运行模式</span>
+                    <select>
+                        <option>Fast</option>
+                        <option selected>Smart</option>
+                        <option>Full</option>
+                    </select>
+                </label>
+                <div class="tabs">
+                    <button class="tab active" data-target="all">默认全部</button>
+                    <button class="tab" data-target="manual">粘贴清单</button>
+                    <button class="tab" data-target="sql">SQL</button>
+                </div>
+                <p id="tabHint" class="hint">系统默认选择全部可预测 SPU。</p>
+
+                <div class="input-area" id="manualPanel">
+                    <textarea placeholder="支持逗号、空格、换行输入 SPU"></textarea>
+                </div>
+                <div class="input-area hidden" id="sqlPanel">
+                    <textarea placeholder="仅允许返回单列 spu 的 SELECT 语句"></textarea>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn secondary">预览 SPU</button>
+                    <button class="btn primary">启动任务</button>
+                </div>
+                <div class="preview">
+                    <div class="preview-head">
+                        <strong>SPU 预览</strong>
+                        <span>4 个</span>
+                    </div>
+                    <div class="pills">
+                        <span>SPU001</span><span>SPU008</span><span>SPU021</span><span>SPU103</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-head">
+                    <h2>2. 运行状态</h2>
+                    <span class="run-state running">running</span>
+                </div>
+                <div class="metrics">
+                    <article><p>整体进度</p><strong>62%</strong></article>
+                    <article><p>已处理 / 总数</p><strong>31 / 50</strong></article>
+                    <article><p>成功 SPU</p><strong>29</strong></article>
+                    <article><p>当前 SPU</p><strong>SPU021</strong></article>
+                </div>
+                <div class="bar-wrap"><div class="bar"></div></div>
+                <div class="split">
+                    <div class="panel">
+                        <h3>结果摘要</h3>
+                        <ul>
+                            <li>平均 WMAPE: 11.8%</li>
+                            <li>胜出模型: Ensemble_Seas</li>
+                            <li>失败 SPU: 2</li>
+                        </ul>
+                    </div>
+                    <div class="panel">
+                        <h3>异常提醒</h3>
+                        <p class="warn">2 个 SPU 预测失败，建议查看日志并重跑失败项。</p>
+                        <button class="btn ghost">查看日志</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <section class="card">
+            <div class="card-head">
+                <h2>3. 预测结果与日志（重点区域）</h2>
+                <span class="badge">扩展展示</span>
+            </div>
+            <div class="summary-kpis">
+                <div class="kpi">
+                    <p>当前预测结果（SPU021）</p>
+                    <strong>12,460</strong>
+                </div>
+                <div class="kpi">
+                    <p>最强模型</p>
+                    <strong>Ensemble_Seas</strong>
+                </div>
+                <div class="kpi">
+                    <p>模型 WMAPE</p>
+                    <strong>9.7%</strong>
+                </div>
+            </div>
+            <div class="result-log-grid">
+                <article>
+                    <p>预测结果明细（示例）</p>
+                    <table class="mini-table">
+                        <thead>
+                            <tr>
+                                <th>SPU</th>
+                                <th>预测值</th>
+                                <th>模型</th>
+                                <th>WMAPE</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>SPU021</td><td>12,460</td><td>Ensemble_Seas</td><td>9.7%</td></tr>
+                            <tr><td>SPU008</td><td>8,930</td><td>Prophet</td><td>11.2%</td></tr>
+                            <tr><td>SPU103</td><td>7,540</td><td>Ensemble_Wgt</td><td>12.5%</td></tr>
+                            <tr><td>SPU001</td><td>6,880</td><td>Ensemble_Trend</td><td>13.1%</td></tr>
+                        </tbody>
+                    </table>
+                </article>
+                <article>
+                    <p>执行日志（示例）</p>
+                    <div class="log-box">
+                        <div class="log-line"><span class="log-time">09:11:02</span>Run started in smart mode.</div>
+                        <div class="log-line"><span class="log-time">09:11:06</span>Processing SPU021 (1/50).</div>
+                        <div class="log-line"><span class="log-time">09:11:13</span>Winner model = Ensemble_Seas, WMAPE = 9.7%.</div>
+                        <div class="log-line"><span class="log-time">09:11:18</span>Result saved to database, run_id = run_20260320_x1.</div>
+                        <div class="log-line"><span class="log-time">09:11:22</span>Processing SPU008 (2/50).</div>
+                        <div class="log-line"><span class="log-time">09:11:31</span>Run progress 62%, success 29, failed 2.</div>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+    <script>
+        const hint = document.getElementById("tabHint");
+        const manualPanel = document.getElementById("manualPanel");
+        const sqlPanel = document.getElementById("sqlPanel");
+        const messages = {
+            all: "系统默认选择全部可预测 SPU。",
+            manual: "支持逗号、空格、换行输入，系统自动去重。",
+            sql: "仅允许返回单列 spu 的 SELECT 语句。",
+        };
+
+        document.querySelectorAll(".tab").forEach((button) => {
+            button.addEventListener("click", () => {
+                document.querySelectorAll(".tab").forEach((tab) => tab.classList.remove("active"));
+                button.classList.add("active");
+                const mode = button.dataset.target;
+                hint.textContent = messages[mode];
+                manualPanel.classList.toggle("hidden", mode !== "manual");
+                sqlPanel.classList.toggle("hidden", mode !== "sql");
+            });
+        });
+    </script>
+</body>
+</html>

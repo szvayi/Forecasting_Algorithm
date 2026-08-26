@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>华熠智能预测执行台</title>
+    <style>
+        :root {
+            --bg: #f5f7fa;
+            --surface: #ffffff;
+            --surface-soft: #fafbfc;
+            --line: #e8edf3;
+            --line-strong: #d7dee7;
+            --text: #111827;
+            --text-2: #374151;
+            --muted: #6b7280;
+            --brand: #1f4fd6;
+            --brand-soft: #eef4ff;
+            --success: #16a34a;
+            --warning: #d97706;
+            --danger: #dc2626;
+            --shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+            --radius-xl: 20px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --max: 1440px;
+        }
+
+        * { box-sizing: border-box; }
+        html, body { height: 100%; }
+
+        body {
+            margin: 0;
+            font-family: "Inter", "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        .page {
+            max-width: var(--max);
+            margin: 0 auto;
+            padding: 28px 24px 40px;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .brand-block {
+            min-width: 0;
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border: 1px solid var(--line);
+            border-radius: 999px;
+            background: rgba(255,255,255,.78);
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: .04em;
+        }
+
+        .eyebrow::before {
+            content: "";
+            width: 6px;
+            height: 6px;
+            border-radius: 999px;
+            background: var(--brand);
+        }
+
+        h1 {
+            margin: 14px 0 8px;
+            font-size: clamp(30px, 3vw, 46px);
+            line-height: 1.08;
+            letter-spacing: -0.04em;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+            max-width: 760px;
+        }
+
+        .hero-card,
+        .panel {
+            background: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+        }
+
+        .hero-card {
+            padding: 28px;
+            margin-bottom: 22px;
+        }
+
+        .section-kicker {
+            color: var(--muted);
+            font-size: 12px;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .hero-number {
+            display: flex;
+            align-items: flex-end;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .hero-number .value {
+            font-size: clamp(48px, 5vw, 72px);
+            line-height: .95;
+            letter-spacing: -0.06em;
+            font-weight: 700;
+        }
+
+        .hero-number .meta {
+            color: var(--muted);
+            font-size: 14px;
+            padding-bottom: 8px;
+        }
+
+        .hero-desc {
+            margin: 0;
+            color: var(--text-2);
+            font-size: 14px;
+            line-height: 1.8;
+            max-width: 760px;
+        }
+
+        .hero-metrics {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 22px;
+        }
+
+        .metric {
+            padding: 18px;
+            border-radius: var(--radius-lg);
+            background: var(--surface-soft);
+            border: 1px solid var(--line);
+            min-height: 124px;
+        }
+
+        .metric-label {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .metric-value {
+            font-size: clamp(28px, 2.6vw, 40px);
+            line-height: 1;
+            letter-spacing: -0.04em;
+            font-weight: 700;
+            min-height: 40px;
+        }
+
+        .metric-note {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(380px, .92fr);
+            gap: 22px;
+            align-items: start;
+        }
+
+        .secondary-grid {
+            display: grid;
+            grid-template-columns: minmax(320px, .9fr) minmax(0, 1.1fr);
+            gap: 22px;
+            margin-top: 22px;
+            align-items: start;
+        }
+
+        .stack {
+            display: grid;
+            gap: 22px;
+        }
+
+        .panel {
+            padding: 24px;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .panel-note {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+            text-align: right;
+        }
+
+        .scope-grid, .stats-grid, .stepper {
+            display: grid;
+            gap: 12px;
+        }
+
+        .scope-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .stepper { grid-template-columns: repeat(4, minmax(0, 1fr)); margin-bottom: 18px; }
+
+        .mini, .step {
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            background: var(--surface-soft);
+        }
+
+        .mini {
+            padding: 18px;
+            min-height: 116px;
+        }
+
+        .mini-value {
+            font-size: clamp(24px, 2vw, 34px);
+            line-height: 1.05;
+            letter-spacing: -0.04em;
+            font-weight: 700;
+            min-height: 36px;
+            display: flex;
+            align-items: center;
+        }
+
+        .mini-label, .step-note {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .step {
+            padding: 18px;
+            background: #fff;
+            min-height: 118px;
+            transition: .2s ease;
+        }
+
+        .step-index {
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            border: 1px solid var(--line-strong);
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .step-title {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .step.active {
+            border-color: #cfe0ff;
+            background: var(--brand-soft);
+        }
+
+        .step.active .step-index {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: #fff;
+        }
+
+        .step.done .step-index {
+            background: var(--success);
+            border-color: var(--success);
+            color: #fff;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: #9ca3af;
+            flex: 0 0 auto;
+        }
+
+        .dot.running { background: var(--warning); }
+        .dot.completed { background: var(--success); }
+        .dot.failed { background: var(--danger); }
+
+        .status-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            color: var(--text-2);
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            border-radius: 999px;
+            background: #edf1f6;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, #18326f 0%, #3568e7 100%);
+            transition: width .24s ease;
+        }
+
+        .error-banner {
+            display: none;
+            margin-bottom: 14px;
+            padding: 13px 15px;
+            border-radius: 14px;
+            background: #fff7f7;
+            border: 1px solid #ffd8d8;
+            color: var(--danger);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .log-panel {
+            min-height: 690px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ghost-btn {
+            appearance: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            height: 42px;
+            padding: 0 18px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s ease;
+            border: 1px solid var(--line-strong);
+            background: var(--surface);
+            color: var(--text-2);
+        }
+
+        .ghost-btn:hover { transform: translateY(-1px); }
+
+        .primary-btn {
+            appearance: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            height: 42px;
+            padding: 0 18px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: .2s ease;
+            border: 1px solid #d2def9;
+            background: var(--brand);
+            color: #fff;
+        }
+
+        .primary-btn:hover { transform: translateY(-1px); }
+
+        .primary-btn:disabled,
+        .ghost-btn:disabled {
+            cursor: not-allowed;
+            opacity: .55;
+            transform: none;
+        }
+
+        .log-box {
+            flex: 1;
+            min-height: 560px;
+            max-height: 560px;
+            overflow: auto;
+            padding: 16px;
+            border-radius: 16px;
+            border: 1px solid #e3e8ef;
+            background: #f8fafc;
+        }
+
+        .log-entry {
+            font-family: Consolas, "SFMono-Regular", monospace;
+            font-size: 12px;
+            line-height: 1.85;
+            color: #334155;
+            word-break: break-word;
+        }
+
+        .log-entry + .log-entry { margin-top: 6px; }
+        .log-success { color: #15803d; }
+        .log-warning { color: #b45309; }
+        .log-error { color: #c2410c; }
+
+        .schedule-form {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .field {
+            display: grid;
+            gap: 8px;
+        }
+
+        .field.wide {
+            grid-column: 1 / -1;
+        }
+
+        .field label {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .field select,
+        .field input {
+            width: 100%;
+            height: 42px;
+            border-radius: 12px;
+            border: 1px solid var(--line-strong);
+            background: #fff;
+            padding: 0 12px;
+            font-size: 14px;
+            color: var(--text);
+        }
+
+        .inline-note {
+            margin-top: 12px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        .history-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .history-item {
+            border: 1px solid var(--line);
+            border-radius: var(--radius-lg);
+            background: var(--surface-soft);
+            padding: 16px;
+        }
+
+        .history-top,
+        .history-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .history-top {
+            margin-bottom: 10px;
+        }
+
+        .history-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .history-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-2);
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            height: 24px;
+            padding: 0 10px;
+            border-radius: 999px;
+            border: 1px solid var(--line-strong);
+            background: #fff;
+            font-size: 12px;
+            color: var(--text-2);
+        }
+
+        .history-meta {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 1240px) {
+            .hero-card,
+            .main-grid,
+            .secondary-grid,
+            .scope-grid,
+            .stats-grid,
+            .stepper,
+            .hero-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 860px) {
+            .page { padding: 18px 14px 28px; }
+            .topbar { flex-direction: column; }
+            .log-box { min-height: 420px; max-height: 420px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <header class="topbar">
+            <div class="brand-block">
+                <div class="eyebrow">华熠智能预测系统</div>
+                <div class="mode-switch" hidden data-mode="smart-only"></div>
+                <h1>智能预测执行台</h1>
+                <p class="subtitle">默认由 Linux 定时任务执行；如果当前没有运行中的任务，也可以从前端临时发起一次手工执行，并持续查看运行状态。</p>
+            </div>
+        </header>
+
+        <section class="hero-card">
+            <div class="hero-main">
+                <div class="section-kicker">Overview</div>
+                <div class="hero-number">
+                    <div class="value" id="summaryParticipating">-</div>
+                    <div class="meta">参与预测 SPU</div>
+                </div>
+                <p class="hero-desc">当前视图聚焦三个问题：本轮有多少 SPU 真正参与预测、整体表现是否稳定、当前胜出算法是否明确。信息尽量收敛，减少干扰，方便快速判断是否需要排查与复盘。</p>
+
+                <div class="hero-metrics">
+                    <div class="metric">
+                        <div class="metric-label">整体平均 WMAPE</div>
+                        <div class="metric-value" id="summaryWmape">-</div>
+                        <div class="metric-note">越低越好，用于观察整体预测质量。</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">主力算法</div>
+                        <div class="metric-value" id="summaryAlgo">-</div>
+                        <div class="metric-note" id="summaryAlgoCount"></div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">当前样本门槛</div>
+                        <div class="metric-value" id="scopeMinWeeks">108 周</div>
+                        <div class="metric-note">当前作为观测口径展示，不再允许前端切换模式。</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <main class="main-grid">
+            <div class="stack">
+                <section class="panel">
+                    <div class="panel-head">
+                        <div class="panel-title">执行范围</div>
+                        <div class="panel-note">展示全量样本与本轮实际纳入测试的 SPU 数量</div>
+                    </div>
+                    <div class="scope-grid">
+                        <div class="mini"><div class="mini-value" id="scopeTotalSpus">-</div><div class="mini-label">全量 SPU</div></div>
+                        <div class="mini"><div class="mini-value" id="scopeEligibleSpus">-</div><div class="mini-label">目标测试 SPU</div></div>
+                        <div class="mini"><div class="mini-value" id="scopeExcludedSpus">-</div><div class="mini-label">未纳入本次</div></div>
+                        <div class="mini"><div class="mini-value" id="currentSpu">-</div><div class="mini-label">当前处理 SPU</div></div>
+                    </div>
+                    <div style="margin-top: 14px; display: flex; gap: 12px; flex-wrap: wrap;">
+                        <button id="manualRunBtn" class="primary-btn" type="button">临时执行一次</button>
+                        <div class="inline-note" id="manualRunHint" style="margin-top: 0;">当前无运行任务时可手工触发一次，默认使用 smart 模式与 108 周门槛。</div>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <div class="panel-title">执行进度</div>
+                        <div class="panel-note">保留关键步骤，不做多余装饰</div>
+                    </div>
+                    <div id="errorBanner" class="error-banner"></div>
+                    <div class="stepper">
+                        <div class="step" data-step="1"><div class="step-index">1</div><div class="step-title">样本确认</div><div class="step-note">确认本轮参与预测的实际范围。</div></div>
+                        <div class="step" data-step="2"><div class="step-index">2</div><div class="step-title">模型执行</div><div class="step-note">进入实际预测执行链路。</div></div>
+                        <div class="step" data-step="3"><div class="step-index">3</div><div class="step-title">结果汇总</div><div class="step-note">统计本轮完成度与胜出情况。</div></div>
+                        <div class="step" data-step="4"><div class="step-index">4</div><div class="step-title">入库确认</div><div class="step-note">确认结果稳定落库，便于复盘。</div></div>
+                    </div>
+                    <div class="status-line">
+                        <span class="dot" id="statusDot"></span>
+                        <span id="statusText">空闲</span>
+                    </div>
+                    <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
+                    <div class="stats-grid">
+                        <div class="mini"><div class="mini-value" id="processedCount">0</div><div class="mini-label">已完成 SPU</div></div>
+                        <div class="mini"><div class="mini-value" id="runTotalCount">0</div><div class="mini-label">本次目标 SPU</div></div>
+                        <div class="mini"><div class="mini-value" id="successCount">0</div><div class="mini-label">成功 SPU</div></div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="panel log-panel">
+                <div class="panel-head">
+                    <div class="panel-title">执行日志</div>
+                    <button id="clearLogsBtn" class="ghost-btn">清空</button>
+                </div>
+                <div id="logContainer" class="log-box">
+                    <div class="log-entry">[初始化] 暂无执行内容，等待 Linux 定时任务写入新的运行日志。</div>
+                </div>
+            </section>
+        </main>
+
+        <section class="secondary-grid">
+            <section class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">每周作业时间</div>
+                    <div class="panel-note">调整后从下次开始按这个时间执行，Linux 正式执行仍需同步 systemd timer</div>
+                </div>
+                <div class="hero-number" style="margin-bottom: 18px;">
+                    <div class="value" id="weeklyScheduleDisplay" style="font-size: 34px;">每周一 01:00</div>
+                    <div class="meta" id="weeklyScheduleEnabled">已启用</div>
+                </div>
+                <div class="schedule-form">
+                    <div class="field">
+                        <label for="scheduleWeekday">执行日期</label>
+                        <select id="scheduleWeekday">
+                            <option value="0">周一</option>
+                            <option value="1">周二</option>
+                            <option value="2">周三</option>
+                            <option value="3">周四</option>
+                            <option value="4">周五</option>
+                            <option value="5">周六</option>
+                            <option value="6">周日</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="scheduleTime">执行时间</label>
+                        <input id="scheduleTime" type="time" value="01:00" />
+                    </div>
+                    <div class="field wide">
+                        <button id="saveScheduleBtn" class="primary-btn" type="button">保存每周时间</button>
+                        <div class="inline-note" id="scheduleHint">默认每周一 01:00 启动。保存后表示下次开始按这个时间执行，请同步更新 Linux timer。</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">历史作业情况</div>
+                    <div class="panel-note">展示最近 8 次运行的启动时间、耗时与状态</div>
+                </div>
+                <div id="historyList" class="history-list">
+                    <div class="history-item">
+                        <div class="history-title">暂无历史作业记录</div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+        const TARGET_SPU_MIN_WEEKS = 108;
+        let statusCheckInterval = null;
+        let logCheckInterval = null;
+
+        function formatNumber(value) {
+            if (value === null || value === undefined || value === "") return "-";
+            return Number(value).toLocaleString("zh-CN");
+        }
+
+        function formatDateTime(value) {
+            if (!value) return "-";
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return value;
+            return date.toLocaleString("zh-CN", { hour12: false });
+        }
+
+        function formatDuration(startedAt, finishedAt) {
+            if (!startedAt) return "-";
+            const start = new Date(startedAt);
+            const end = finishedAt ? new Date(finishedAt) : new Date();
+            if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return "-";
+            const totalSeconds = Math.max(0, Math.floor((end - start) / 1000));
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            const hours = Math.floor(minutes / 60);
+            if (hours > 0) return `${hours}小时 ${minutes % 60}分`;
+            if (minutes > 0) return `${minutes}分 ${seconds}秒`;
+            return `${seconds}秒`;
+        }
+
+        function resetLogs() {
+            document.getElementById("logContainer").innerHTML =
+                '<div class="log-entry">[初始化] 日志已清空，等待新的执行信息...</div>';
+        }
+
+        function updateStepper(progress, status) {
+            const steps = Array.from(document.querySelectorAll(".step"));
+            let activeStep = 0;
+
+            if (status === "completed") activeStep = 4;
+            else if (status === "failed") activeStep = Math.max(1, progress >= 70 ? 3 : progress >= 20 ? 2 : 1);
+            else if (status === "running") activeStep = progress >= 95 ? 4 : progress >= 70 ? 3 : progress >= 20 ? 2 : 1;
+
+            steps.forEach((step, index) => {
+                const stepNumber = index + 1;
+                step.classList.remove("active", "done");
+                if (activeStep === 0) return;
+                if (stepNumber < activeStep) step.classList.add("done");
+                else if (stepNumber === activeStep) step.classList.add("active");
+            });
+        }
+
+        function resetDashboardPlaceholders() {
+            document.getElementById("summaryParticipating").textContent = "-";
+            document.getElementById("summaryWmape").textContent = "-";
+            document.getElementById("summaryAlgo").textContent = "-";
+            document.getElementById("summaryAlgoCount").textContent = "";
+            document.getElementById("scopeTotalSpus").textContent = "-";
+            document.getElementById("scopeEligibleSpus").textContent = "-";
+            document.getElementById("scopeExcludedSpus").textContent = "-";
+            document.getElementById("scopeMinWeeks").textContent = `${TARGET_SPU_MIN_WEEKS} 周`;
+            document.getElementById("processedCount").textContent = "0";
+            document.getElementById("runTotalCount").textContent = "0";
+            document.getElementById("successCount").textContent = "0";
+            document.getElementById("currentSpu").textContent = "-";
+            document.getElementById("progressFill").style.width = "0%";
+            document.getElementById("statusText").textContent = "空闲";
+            document.getElementById("statusDot").className = "dot";
+            document.getElementById("errorBanner").style.display = "none";
+            document.getElementById("errorBanner").textContent = "";
+            updateStepper(0, "idle");
+            setManualRunState(true, "当前无运行任务时可手工触发一次，默认使用 smart 模式与 108 周门槛。");
+        }
+
+        function presentFriendlyError(message) {
+            if (!message) return "";
+            if (message.includes("No space left on device") || message.includes("DiskFull")) {
+                return "数据库临时空间不足，后端训练数据查询失败。请先处理数据库磁盘空间后再重新执行。";
+            }
+            if (message.includes("缺少关键列") || message.includes("'sales'")) {
+                return "训练数据未成功返回，当前缺少关键销售列。通常是数据库查询失败后的连锁结果，请优先检查数据库状态。";
+            }
+            return message;
+        }
+
+        function addLog(type, message) {
+            const container = document.getElementById("logContainer");
+            const entry = document.createElement("div");
+            const time = new Date().toLocaleTimeString("zh-CN", { hour12: false });
+            entry.className = `log-entry ${type ? `log-${type}` : ""}`;
+            entry.textContent = `[${time}] ${message}`;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function loadWeeklySchedule() {
+            try {
+                const response = await fetch(`${API_BASE}/api/weekly-schedule`);
+                if (!response.ok) return;
+                const schedule = await response.json();
+                document.getElementById("weeklyScheduleDisplay").textContent = schedule.display_text || "-";
+                document.getElementById("weeklyScheduleEnabled").textContent = schedule.enabled ? "已启用" : "已停用";
+                document.getElementById("scheduleWeekday").value = String(schedule.weekday ?? 0);
+                document.getElementById("scheduleTime").value = `${String(schedule.hour ?? 1).padStart(2, "0")}:${String(schedule.minute ?? 0).padStart(2, "0")}`;
+            } catch (error) {
+                document.getElementById("scheduleHint").textContent = `计划时间加载失败: ${error.message}`;
+            }
+        }
+
+        async function saveWeeklySchedule() {
+            const weekday = Number(document.getElementById("scheduleWeekday").value);
+            const [hour, minute] = (document.getElementById("scheduleTime").value || "01:00").split(":").map(Number);
+            const hint = document.getElementById("scheduleHint");
+            hint.textContent = "正在保存计划时间...";
+            try {
+                const response = await fetch(`${API_BASE}/api/weekly-schedule`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        weekday,
+                        hour,
+                        minute,
+                        timezone: "Asia/Shanghai",
+                        enabled: true
+                    })
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const schedule = await response.json();
+                document.getElementById("weeklyScheduleDisplay").textContent = schedule.display_text || "-";
+                document.getElementById("weeklyScheduleEnabled").textContent = schedule.enabled ? "已启用" : "已停用";
+                hint.textContent = "每周计划时间已保存，下次开始按这个时间执行。请同步更新 Linux systemd timer，确保正式执行时间一致。";
+            } catch (error) {
+                hint.textContent = `保存失败: ${error.message}`;
+            }
+        }
+
+        function setManualRunState(enabled, message) {
+            const button = document.getElementById("manualRunBtn");
+            const hint = document.getElementById("manualRunHint");
+            button.disabled = !enabled;
+            hint.textContent = message;
+        }
+
+        async function startManualRun() {
+            setManualRunState(false, "正在提交临时执行请求...");
+            try {
+                const response = await fetch(`${API_BASE}/api/start-analysis`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        mode: "smart",
+                        selection_type: "all"
+                    })
+                });
+                const payload = await response.json();
+                if (!response.ok) {
+                    throw new Error(payload.detail || `HTTP ${response.status}`);
+                }
+                setManualRunState(false, "临时执行已启动，页面正在持续刷新运行状态。");
+                await loadHistoryJobs();
+            } catch (error) {
+                setManualRunState(true, `临时执行失败: ${error.message}`);
+            }
+        }
+
+        function renderHistoryItem(run) {
+            const statusTextMap = {
+                queued: "排队中",
+                running: "运行中",
+                stopping: "停止中",
+                stopped: "已停止",
+                completed: "已完成",
+                failed: "失败"
+            };
+            const triggerText = run.trigger_source === "schedule" ? "自动" : "手动";
+            const started = run.started_at || run.created_at;
+            const targetCount = run.summary?.scope_eligible_spus ?? run.total_count ?? 0;
+            const duration = formatDuration(started, run.finished_at);
+            return `
+                <div class="history-item">
+                    <div class="history-top">
+                        <div class="history-title">Run ${run.id.slice(0, 8)} · ${statusTextMap[run.status] || run.status}</div>
+                        <div class="history-status"><span class="pill">${triggerText}</span><span class="pill">${(run.mode || "smart").toUpperCase()}</span></div>
+                    </div>
+                    <div class="history-meta">
+                        <span>启动时间：${formatDateTime(started)}</span>
+                        <span>结束时间：${formatDateTime(run.finished_at)}</span>
+                        <span>耗时：${duration}</span>
+                    </div>
+                    <div class="history-meta">
+                        <span>目标测试 SPU：${formatNumber(targetCount)}</span>
+                        <span>成功：${formatNumber(run.success_count || 0)}</span>
+                        <span>处理进度：${formatNumber(run.processed_count || 0)} / ${formatNumber(run.total_count || 0)}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadHistoryJobs() {
+            try {
+                const response = await fetch(`${API_BASE}/api/forecast-jobs?limit=8`);
+                if (!response.ok) return;
+                const runs = await response.json();
+                const container = document.getElementById("historyList");
+                if (!Array.isArray(runs) || !runs.length) {
+                    container.innerHTML = '<div class="history-item"><div class="history-title">暂无历史作业记录</div></div>';
+                    return;
+                }
+                container.innerHTML = runs.map(renderHistoryItem).join("");
+            } catch (error) {
+                document.getElementById("historyList").innerHTML =
+                    `<div class="history-item"><div class="history-title">历史作业加载失败：${error.message}</div></div>`;
+            }
+        }
+
+        function updateStatus(status) {
+            const dot = document.getElementById("statusDot");
+            const text = document.getElementById("statusText");
+            const errorBanner = document.getElementById("errorBanner");
+            const currentStatus = status.status || "idle";
+            dot.className = "dot";
+
+            if (currentStatus === "running") {
+                dot.classList.add("running");
+                text.textContent = "运行中";
+            } else if (currentStatus === "completed") {
+                dot.classList.add("completed");
+                text.textContent = "已完成";
+            } else if (currentStatus === "failed") {
+                dot.classList.add("failed");
+                text.textContent = "执行失败";
+            } else {
+                text.textContent = "空闲";
+            }
+
+            const friendlyError = presentFriendlyError(status.error_message || "");
+            if (friendlyError) {
+                errorBanner.textContent = friendlyError;
+                errorBanner.style.display = "block";
+            } else {
+                errorBanner.style.display = "none";
+                errorBanner.textContent = "";
+            }
+
+            const progress = status.progress || 0;
+            document.getElementById("progressFill").style.width = `${progress}%`;
+            document.getElementById("processedCount").textContent = formatNumber(status.processed_count || 0);
+            document.getElementById("runTotalCount").textContent = formatNumber(status.total_count || 0);
+            document.getElementById("successCount").textContent = formatNumber(status.success_count || 0);
+            document.getElementById("currentSpu").textContent = status.current_spu || "-";
+            document.getElementById("scopeTotalSpus").textContent = formatNumber(status.scope_total_spus || 0);
+            document.getElementById("scopeEligibleSpus").textContent = formatNumber(status.scope_eligible_spus || 0);
+            document.getElementById("scopeExcludedSpus").textContent = formatNumber(status.scope_excluded_spus || 0);
+            document.getElementById("scopeMinWeeks").textContent = `${status.scope_min_weeks || TARGET_SPU_MIN_WEEKS} 周`;
+            updateStepper(progress, currentStatus);
+
+            if (currentStatus === "running" || currentStatus === "queued" || currentStatus === "stopping") {
+                setManualRunState(false, "当前已有运行中的任务，临时执行按钮已自动禁用。");
+            } else {
+                setManualRunState(true, "当前无运行任务时可手工触发一次，默认使用 smart 模式与 108 周门槛。");
+            }
+        }
+
+        function startStatusCheck() {
+            stopStatusCheck();
+            statusCheckInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/api/analysis-status`);
+                    const status = await response.json();
+                    updateStatus(status);
+                } catch (error) {
+                    addLog("warning", `状态刷新失败: ${error.message}`);
+                }
+            }, 1000);
+        }
+
+        function stopStatusCheck() {
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+                statusCheckInterval = null;
+            }
+        }
+
+        function startLogCheck() {
+            stopLogCheck();
+            logCheckInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`${API_BASE}/api/analysis-logs`);
+                    const data = await response.json();
+                    const logs = data.logs || [];
+                    if (!logs.length) return;
+
+                    const container = document.getElementById("logContainer");
+                    container.innerHTML = "";
+                    logs.forEach((log) => {
+                        let klass = "";
+                        let displayText = log;
+
+                        if (typeof log !== "string") {
+                            displayText = log.message || "";
+                        }
+
+                        if (displayText.includes("ERROR") || displayText.includes("失败") || displayText.includes("Traceback")) klass = "log-error";
+                        else if (displayText.includes("SUCCESS") || displayText.includes("成功") || displayText.includes("完成")) klass = "log-success";
+                        else if (displayText.includes("WARNING") || displayText.includes("警告")) klass = "log-warning";
+
+                        if (displayText.includes("No space left on device") || displayText.includes("DiskFull")) {
+                            displayText = "数据库临时空间不足，训练数据查询失败。请先处理数据库磁盘空间。";
+                            klass = "log-error";
+                        } else if (displayText.includes("'sales'")) {
+                            displayText = "训练数据未成功返回，当前缺少关键销售列。";
+                            klass = "log-warning";
+                        }
+
+                        const line = document.createElement("div");
+                        line.className = `log-entry ${klass}`;
+                        line.textContent = displayText;
+                        container.appendChild(line);
+                    });
+                    container.scrollTop = container.scrollHeight;
+                } catch (error) {
+                    addLog("warning", `日志刷新失败: ${error.message}`);
+                }
+            }, 1200);
+        }
+
+        function stopLogCheck() {
+            if (logCheckInterval) {
+                clearInterval(logCheckInterval);
+                logCheckInterval = null;
+            }
+        }
+
+        document.getElementById("clearLogsBtn").addEventListener("click", resetLogs);
+        document.getElementById("saveScheduleBtn").addEventListener("click", saveWeeklySchedule);
+        document.getElementById("manualRunBtn").addEventListener("click", startManualRun);
+
+        resetDashboardPlaceholders();
+        (async function restoreRuntimeState() {
+            try {
+                const response = await fetch(`${API_BASE}/api/analysis-status`);
+                if (!response.ok) return;
+                const status = await response.json();
+                updateStatus(status);
+                startStatusCheck();
+                startLogCheck();
+                loadHistoryJobs();
+                loadWeeklySchedule();
+                setInterval(loadHistoryJobs, 8000);
+            } catch (error) {
+                console.debug("restore status skipped", error);
+            }
+        })();
+    </script>
+</body>
+</html>

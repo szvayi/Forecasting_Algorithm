@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SPU MVP 项目管理看板</title>
+  <link rel="stylesheet" href="/static/pm-dashboard.css">
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div>
+        <p class="tag">Project Management</p>
+        <h1>SPU MVP 项目管理看板</h1>
+        <p class="sub">
+          目标固定：先完成 SPU 预测 MVP 闭环（前端触发、后端执行、数据库入库与查询），再推进其他任务。
+        </p>
+      </div>
+      <div class="hero-card">
+        <div class="kpi">
+          <span>门禁通过率</span>
+          <strong id="gatePassRate">0%</strong>
+        </div>
+        <div class="kpi">
+          <span>当前阶段</span>
+          <strong id="projectPhase">MVP Closing</strong>
+        </div>
+        <button id="copySummaryBtn" class="btn">复制项目总结</button>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="panel">
+        <h2>MVP 范围边界</h2>
+        <div class="columns">
+          <div>
+            <h3>本阶段要做</h3>
+            <ul id="scopeIn"></ul>
+          </div>
+          <div>
+            <h3>本阶段不做</h3>
+            <ul id="scopeOut"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>验收门禁</h2>
+        <p class="hint">通过标准：连续 3 次主链路稳定通过，无“完成无结果”或“显示成功但入库失败”。</p>
+        <table>
+          <thead>
+            <tr>
+              <th>门禁项</th>
+              <th>状态</th>
+              <th>备注</th>
+            </tr>
+          </thead>
+          <tbody id="gateTableBody"></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>每日推进看板</h2>
+        <div class="board">
+          <article>
+            <h3>TODO</h3>
+            <ul id="todoList"></ul>
+          </article>
+          <article>
+            <h3>DOING</h3>
+            <ul id="doingList"></ul>
+          </article>
+          <article>
+            <h3>DONE</h3>
+            <ul id="doneList"></ul>
+          </article>
+          <article>
+            <h3>RISK</h3>
+            <ul id="riskList"></ul>
+          </article>
+          <article>
+            <h3>BLOCKED</h3>
+            <ul id="blockedList"></ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>下一步优先任务</h2>
+        <ol id="nextActions"></ol>
+      </section>
+    </main>
+  </div>
+
+  <script src="/static/pm-dashboard.js"></script>
+</body>
+</html>

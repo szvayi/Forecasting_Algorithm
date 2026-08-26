@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>销售预测分析系统 - 演示版</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 0.2em solid currentColor;
+            border-right-color: transparent;
+            border-radius: 50%;
+            animation: spinner-border .75s linear infinite;
+        }
+        @keyframes spinner-border {
+            to { transform: rotate(360deg); }
+        }
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+        .success-bg {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+        .info-bg {
+            background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        }
+        .warning-bg {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+        }
+        .error-bg {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-primary">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">销售预测分析系统</span>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-light text-dark me-2">状态: <span class="text-success">✅ 演示模式</span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- 控制面板 -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h5 class="mb-0">预测分析</h5>
+                        <small class="text-muted">点击开始对数据库中的SPU进行销售预测分析</small>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button id="start-analysis" class="btn btn-primary">
+                            <span id="btn-icon">▶</span> 开始分析
+                        </button>
+                        <button id="reset-analysis" class="btn btn-outline-secondary" style="display: none;">
+                            ↻ 重新开始
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 进度显示 -->
+        <div id="progress-section" class="card mb-4" style="display: none;">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span id="progress-title">正在分析...</span>
+                    <span id="progress-percent">0%</span>
+                </div>
+                <div class="progress mb-3" style="height: 20px;">
+                    <div id="progress-bar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                         role="progressbar" style="width: 0%">0%</div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <small class="text-muted">当前处理: <span id="current-spu" class="fw-bold">SPU001</span></small>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <small class="text-muted">已处理: <span id="processed-count">0</span> / <span id="total-count">10</span> SPU</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 分析结果汇总 -->
+        <div id="summary-section" class="row mb-4" style="display: none;">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">总SPU数</h6>
+                        <div id="total-spus" class="metric-value text-primary">10</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">成功预测</h6>
+                        <div id="success-spus" class="metric-value text-success">8</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">失败数量</h6>
+                        <div id="failed-spus" class="metric-value text-danger">2</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h6 class="text-muted">最佳模型</h6>
+                        <div id="best-model" class="metric-value text-info">XGBoost</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 详细结果 -->
+        <div id="detail-section" style="display: none;">
+            <!-- Tab导航 -->
+            <ul class="nav nav-tabs mb-3" id="result-tabs" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link active" id="chart-tab" data-bs-toggle="tab" data-bs-target="#chart-panel" type="button">
+                        📊 预测效果图
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="table-tab" data-bs-toggle="tab" data-bs-target="#table-panel" type="button">
+                        📋 详细数据
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" id="failed-tab" data-bs-toggle="tab" data-bs-target="#failed-panel" type="button">
+                        ⚠️ 失败记录
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab内容 -->
+            <div class="tab-content">
+                <!-- 图表面板 -->
+                <div class="tab-pane fade show active" id="chart-panel">
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">选择SPU查看详情</label>
+                                    <select id="spu-select" class="form-select">
+                                        <option value="">-- 选择SPU --</option>
+                                        <option value="SPU001">SPU001</option>
+                                        <option value="SPU002">SPU002</option>
+                                        <option value="SPU003">SPU003</option>
+                                        <option value="SPU004">SPU004</option>
+                                        <option value="SPU005">SPU005</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">选择指标</label>
+                                    <select id="metric-select" class="form-select">
+                                        <option value="wmape">WMAPE误差</option>
+                                        <option value="mape">MAPE误差</option>
+                                        <option value="mae">MAE绝对误差</option>
+                                        <option value="rmse">RMSE均方根误差</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button id="export-btn" class="btn btn-outline-primary">
+                                        📥 导出结果
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="comparison-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 最佳SPU详情 -->
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h6 class="mb-0">🏆 最佳预测SPU - <span id="best-spu-name">SPU003</span></h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <p><strong>最佳模型:</strong> <span id="best-algo" class="badge bg-info">XGBoost</span></p>
+                                    <p><strong>WMAPE:</strong> <span id="best-wmape" class="text-success">5.23%</span></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p><strong>预测天数:</strong> <span id="best-horizon">30天</span></p>
+                                    <p><strong>MAPE:</strong> <span id="best-mape">4.87%</span></p>
+                                </div>
+                                <div class="col-md-4">
+                                    <p><strong>数据点数:</strong> <span id="best-data-points">180</span></p>
+                                    <p><strong>RMSE:</strong> <span id="best-rmse">125.67</span></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 数据表格面板 -->
+                <div class="tab-pane fade" id="table-panel">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover" id="result-table">
+                                    <thead>
+                                        <tr>
+                                            <th>SPU</th>
+                                            <th>最佳模型</th>
+                                            <th>WMAPE</th>
+                                            <th>MAPE</th>
+                                            <th>MAE</th>
+                                            <th>RMSE</th>
+                                            <th>预测天数</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="result-table-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 失败记录面板 -->
+                <div class="tab-pane fade" id="failed-panel">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="failed-list">
+                                <ul class="list-group">
+                                    <li class="list-group-item list-group-item-danger">
+                                        <strong>SPU008</strong>: 数据不足，无法进行预测
+                                    </li>
+                                    <li class="list-group-item list-group-item-danger">
+                                        <strong>SPU010</strong>: 模型训练失败
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 错误提示 -->
+        <div id="error-section" class="alert alert-danger" style="display: none;">
+            <h5>❌ 分析失败</h5>
+            <p id="error-message">分析过程中发生错误，请重试</p>
+            <button id="retry-btn" class="btn btn-outline-danger">重试</button>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // 模拟数据
+        const mockData = {
+            total_spus: 10,
+            successful_spus: 8,
+            failed_spus: 2,
+            best_spu: {
+                spu: "SPU003",
+                winner_algo: "XGBoost",
+                winner_wmape: 0.0523,
+                winner_mape: 0.0487,
+                winner_mae: 105.43,
+                winner_rmse: 125.67,
+                forecast_horizon: 30,
+                data_points: 180
+            },
+            all_reports: [
+                { spu: "SPU001", winner_algo: "Prophet", winner_wmape: 0.0876, winner_mape: 0.0754, winner_mae: 156.78, winner_rmse: 189.34, forecast_horizon: 30 },
+                { spu: "SPU002", winner_algo: "LightGBM", winner_wmape: 0.0632, winner_mape: 0.0598, winner_mae: 123.45, winner_rmse: 145.67, forecast_horizon: 30 },
+                { spu: "SPU003", winner_algo: "XGBoost", winner_wmape: 0.0523, winner_mape: 0.0487, winner_mae: 105.43, winner_rmse: 125.67, forecast_horizon: 30 },
+                { spu: "SPU004", winner_algo: "AutoARIMA", winner_wmape: 0.0987, winner_mape: 0.0876, winner_mae: 178.90, winner_rmse: 201.23, forecast_horizon: 30 },
+                { spu: "SPU005", winner_algo: "XGBoost", winner_wmape: 0.0678, winner_mape: 0.0634, winner_mae: 134.56, winner_rmse: 156.78, forecast_horizon: 30 },
+                { spu: "SPU006", winner_algo: "LightGBM", winner_wmape: 0.0745, winner_mape: 0.0698, winner_mae: 145.67, winner_rmse: 167.89, forecast_horizon: 30 },
+                { spu: "SPU007", winner_algo: "Prophet", winner_wmape: 0.1023, winner_mape: 0.0956, winner_mae: 189.01, winner_rmse: 212.34, forecast_horizon: 30 },
+                { spu: "SPU009", winner_algo: "XGBoost", winner_wmape: 0.0789, winner_mape: 0.0745, winner_mae: 156.78, winner_rmse: 178.90, forecast_horizon: 30 }
+            ],
+            failed_details: [
+                { spu: "SPU008", reason: "数据不足，无法进行预测" },
+                { spu: "SPU010", reason: "模型训练失败" }
+            ]
+        };
+
+        let chart = null;
+
+        // 启动分析
+        $('#start-analysis').click(function() {
+            const $btn = $(this);
+            $btn.prop('disabled', true).html('<span class="loading-spinner"></span> 分析中...');
+            $('#error-section').hide();
+            $('#progress-section').show();
+            $('#detail-section').hide();
+            $('#summary-section').hide();
+            $('#reset-analysis').hide();
+            
+            // 模拟进度
+            let progress = 0;
+            let processed = 0;
+            const total = 10;
+            const spus = ['SPU001', 'SPU002', 'SPU003', 'SPU004', 'SPU005', 'SPU006', 'SPU007', 'SPU008', 'SPU009', 'SPU010'];
+            
+            const interval = setInterval(function() {
+                progress += 10;
+                processed += 1;
+                
+                if (processed <= total) {
+                    $('#progress-bar').css('width', progress + '%').text(progress + '%');
+                    $('#progress-percent').text(progress + '%');
+                    $('#current-spu').text(spus[processed - 1]);
+                    $('#processed-count').text(processed);
+                    $('#total-count').text(total);
+                }
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(function() {
+                        onAnalysisComplete(mockData);
+                        $btn.prop('disabled', false).html('<span id="btn-icon">▶</span> 开始分析');
+                    }, 500);
+                }
+            }, 500);
+        });
+
+        // 分析完成
+        function onAnalysisComplete(result) {
+            $('#start-analysis').hide();
+            $('#reset-analysis').show();
+            $('#progress-section').hide();
+            $('#summary-section').show();
+            $('#detail-section').show();
+
+            // 更新汇总数据
+            $('#total-spus').text(result.total_spus);
+            $('#success-spus').text(result.successful_spus);
+            $('#failed-spus').text(result.failed_spus);
+            $('#best-model').text(result.best_spu?.winner_algo || '-');
+
+            // 更新最佳SPU详情
+            if (result.best_spu) {
+                $('#best-spu-name').text(result.best_spu.spu);
+                $('#best-algo').text(result.best_spu.winner_algo);
+                $('#best-wmape').text((result.best_spu.winner_wmape * 100).toFixed(2) + '%');
+                $('#best-mape').text((result.best_spu.winner_mape * 100).toFixed(2) + '%');
+                $('#best-mae').text(result.best_spu.winner_mae?.toFixed(2) || '-');
+                $('#best-rmse').text(result.best_spu.winner_rmse?.toFixed(2) || '-');
+                $('#best-horizon').text(result.best_spu.forecast_horizon + '天');
+                $('#best-data-points').text(result.best_spu.data_points);
+            }
+
+            // 填充SPU选择下拉框
+            const spuSelect = $('#spu-select');
+            spuSelect.empty().append('<option value="">-- 选择SPU --</option>');
+            result.all_reports.forEach(function(report) {
+                spuSelect.append(`<option value="${report.spu}">${report.spu}</option>`);
+            });
+
+            // 渲染表格
+            renderResultTable(result.all_reports);
+
+            // 绘制图表
+            renderChart(result.all_reports);
+        }
+
+        // 渲染结果表格
+        function renderResultTable(reports) {
+            const tbody = $('#result-table-body');
+            tbody.empty();
+            
+            reports.forEach(function(report) {
+                tbody.append(`
+                    <tr>
+                        <td><strong>${report.spu}</strong></td>
+                        <td><span class="badge bg-info">${report.winner_algo}</span></td>
+                        <td>${(report.winner_wmape * 100).toFixed(2)}%</td>
+                        <td>${(report.winner_mape * 100).toFixed(2)}%</td>
+                        <td>${report.winner_mae?.toFixed(2) || '-'}</td>
+                        <td>${report.winner_rmse?.toFixed(2) || '-'}</td>
+                        <td>${report.forecast_horizon}天</td>
+                    </tr>
+                `);
+            });
+        }
+
+        // 绘制图表
+        function renderChart(reports) {
+            const ctx = document.getElementById('comparison-chart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            // 按WMAPE排序
+            const sorted = [...reports].sort((a, b) => a.winner_wmape - b.winner_wmape);
+            const labels = sorted.map(r => r.spu);
+            const wmapeData = sorted.map(r => r.winner_wmape * 100);
+            const mapeData = sorted.map(r => r.winner_mape * 100);
+
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'WMAPE (%)',
+                        data: wmapeData,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }, {
+                        label: 'MAPE (%)',
+                        data: mapeData,
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: '误差率 (%)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '各SPU预测误差对比 (越低越好)'
+                        }
+                    }
+                }
+            });
+        }
+
+        // 导出结果
+        $('#export-btn').click(function() {
+            const blob = new Blob([JSON.stringify(mockData, null, 2)], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `forecast_result_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // 重置
+        $('#reset-analysis').click(function() {
+            $('#progress-section').hide();
+            $('#summary-section').hide();
+            $('#detail-section').hide();
+            $('#error-section').hide();
+            $('#start-analysis').show().prop('disabled', false).html('<span id="btn-icon">▶</span> 开始分析');
+            $(this).hide();
+        });
+
+        // 重试
+        $('#retry-btn').click(function() {
+            $('#error-section').hide();
+            $('#start-analysis').click();
+        });
+    </script>
+</body>
+</html>

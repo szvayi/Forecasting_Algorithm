@@ -1,0 +1,5 @@
+# 测试配置文件
+pytest == 6.2.5
+coverage == 5.5
+pytest-cov == 2.12.1
+mock == 4.0.3

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forecast Control Platform</title>
+    <link rel="stylesheet" href="/static/platform.css?v=20260413c">
+    <style>
+      .hero-stats,
+      .hero .hero-stats {
+        display: none !important;
+      }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <header class="hero">
+            <div>
+                <p class="eyebrow">Forecast Platform</p>
+                <h1>SPU 预测执行平台</h1>
+                <p class="hero-copy">保留整体进度、SPU 预测情况与执行日志，同时支持可复用配置和每周执行计划。</p>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-card">
+                    <span class="stat-label">当前运行</span>
+                    <strong id="heroRunStatus">空闲</strong>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-label">最近任务</span>
+                    <strong id="heroLastRun">暂无</strong>
+                </div>
+            </div>
+        </header>
+
+        <main class="grid">
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>任务发起</h2>
+                    <span class="badge">MVP</span>
+                </div>
+                <label class="field">
+                    <span>运行模式</span>
+                    <select id="modeSelect">
+                        <option value="fast">Fast</option>
+                        <option value="smart" selected>Smart</option>
+                        <option value="full">Full</option>
+                    </select>
+                </label>
+                <div id="selectionHelp" class="helper-text">系统将自动解析当前可预测的全部 SPU。</div>
+                <div class="actions">
+                    <button id="resolveSelectionBtn" class="btn btn-secondary">预览 SPU</button>
+                    <button id="startJobBtn" class="btn btn-primary">启动任务</button>
+                    <button id="stopJobBtn" class="btn btn-danger hidden">停止任务</button>
+                </div>
+                <div id="runFeedback" class="feedback hidden"></div>
+                <div class="preview-box">
+                    <div class="preview-topline">
+                        <strong>SPU 预览</strong>
+                        <span id="selectionCount">0 个</span>
+                    </div>
+                    <div id="selectionPreview" class="pill-list muted">等待解析</div>
+                </div>
+                <details class="secondary-panel top-gap">
+                    <summary>高级设置：配置模板</summary>
+                    <div class="secondary-panel-body">
+                        <label class="field">
+                            <span>配置名称</span>
+                            <input id="configName" type="text" placeholder="例如：每周核心 SPU 预测">
+                        </label>
+                        <label class="field">
+                            <span>业务用途</span>
+                            <input id="configPurpose" type="text" placeholder="例如：运营周会 / 补货决策">
+                        </label>
+                        <div class="actions">
+                            <button id="saveConfigBtn" class="btn btn-secondary">保存配置</button>
+                            <button id="refreshConfigsBtn" class="btn btn-ghost">刷新列表</button>
+                        </div>
+                        <div id="configList" class="stack-list"></div>
+                    </div>
+                </details>
+            </section>
+
+            <section class="panel">
+                <div class="panel-header">
+                    <h2>任务状态</h2>
+                    <span id="runBadge" class="status status-idle">空闲</span>
+                </div>
+                <div class="metrics">
+                    <article class="metric"><span>整体进度</span><strong id="progressValue">0%</strong></article>
+                    <article class="metric"><span>已处理 / 总数</span><strong id="processedValue">0 / 0</strong></article>
+                    <article class="metric"><span>成功 SPU</span><strong id="successValue">0</strong></article>
+                    <article class="metric"><span>当前 SPU</span><strong id="currentSpuValue">-</strong></article>
+                </div>
+                <div class="progress-wrap"><div id="progressBar" class="progress-bar"></div></div>
+                <div class="live-log-panel top-gap">
+                    <div class="panel-header compact">
+                        <h3>实时日志</h3>
+                        <div class="actions">
+                            <span id="liveLogHint" class="muted">启动后会自动刷新</span>
+                            <button id="refreshLogsBtn" class="btn btn-ghost">刷新日志</button>
+                        </div>
+                    </div>
+                    <div id="logList" class="log-list compact"></div>
+                </div>
+                <div class="top-gap">
+                    <h3>最近任务摘要</h3>
+                    <div id="runSummary" class="summary-grid muted">暂无运行数据</div>
+                </div>
+                <details class="secondary-panel top-gap">
+                    <summary>高级设置：执行计划</summary>
+                    <div class="secondary-panel-body">
+                        <label class="field inline">
+                            <span>模板</span>
+                            <select id="scheduleConfigSelect"></select>
+                        </label>
+                        <div class="inline-row">
+                            <select id="scheduleWeekday">
+                                <option value="0">周一</option>
+                                <option value="1">周二</option>
+                                <option value="2">周三</option>
+                                <option value="3">周四</option>
+                                <option value="4">周五</option>
+                                <option value="5">周六</option>
+                                <option value="6">周日</option>
+                            </select>
+                            <input id="scheduleHour" type="number" min="0" max="23" value="9">
+                            <input id="scheduleMinute" type="number" min="0" max="59" value="0">
+                            <button id="saveScheduleBtn" class="btn btn-secondary">保存计划</button>
+                        </div>
+                        <div id="scheduleList" class="stack-list compact"></div>
+                    </div>
+                </details>
+            </section>
+
+            <section class="panel span-full">
+                <details class="secondary-panel">
+                    <summary>高级信息：Linux 运维状态</summary>
+                    <div class="secondary-panel-body">
+                        <div class="panel-header compact">
+                            <div class="actions">
+                                <span id="linuxOpsSummary" class="muted">等待刷新</span>
+                                <button id="refreshLinuxOpsBtn" class="btn btn-ghost">刷新运维状态</button>
+                            </div>
+                        </div>
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <span class="muted">当前日志来源</span>
+                                <strong id="linuxLogSourceValue">-</strong>
+                            </div>
+                            <div class="summary-item">
+                                <span class="muted">下次定期执行</span>
+                                <strong id="linuxNextRunValue">-</strong>
+                            </div>
+                        </div>
+                        <div id="linuxServiceList" class="stack-list top-gap"></div>
+                        <div class="top-gap">
+                            <h3>历史作业（超过 24 小时）</h3>
+                            <div id="historyJobList" class="stack-list compact"></div>
+                        </div>
+                    </div>
+                </details>
+            </section>
+
+            <section class="panel span-full">
+                <div class="result-panel">
+                    <div class="panel-header compact">
+                        <h2>预测结果</h2>
+                        <button id="loadResultsBtn" class="btn btn-ghost">加载当前任务结果</button>
+                    </div>
+                    <div class="result-kpis">
+                        <article class="result-kpi">
+                            <span>当前预测结果</span>
+                            <strong id="currentForecastValue">-</strong>
+                        </article>
+                        <article class="result-kpi">
+                            <span>最强模型</span>
+                            <strong id="bestModelValue">-</strong>
+                        </article>
+                        <article class="result-kpi">
+                            <span>最强模型 WMAPE</span>
+                            <strong id="bestModelWmape">-</strong>
+                        </article>
+                    </div>
+                    <div id="resultSummary" class="pill-list muted">任务完成后可查看结果摘要。</div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SPU</th>
+                                    <th>运行日期</th>
+                                    <th>预测日期</th>
+                                    <th>预测值</th>
+                                    <th>模型</th>
+                                    <th>WMAPE</th>
+                                </tr>
+                            </thead>
+                            <tbody id="resultsTableBody">
+                                <tr><td colspan="6" class="muted">暂无结果</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel span-full">
+                <div class="panel-header">
+                    <h2>SPU 状态</h2>
+                </div>
+                <div id="spuList" class="stack-list tall"></div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/static/platform.js?v=20260413c"></script>
+</body>
+</html>

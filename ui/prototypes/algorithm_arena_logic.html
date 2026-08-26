@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>算法模块“竞技场”机制逻辑汇报</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #f7f9fc;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+        h2 {
+            color: #34495e;
+            margin-top: 35px;
+            border-left: 5px solid #2ecc71;
+            padding-left: 12px;
+            font-size: 22px;
+        }
+        h3 {
+            color: #555;
+            margin-top: 25px;
+            font-size: 18px;
+        }
+        p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+        .highlight {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .step-box {
+            background-color: #e8f6f3;
+            border: 1px solid #d1f2eb;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .step-title {
+            font-weight: bold;
+            color: #16a085;
+            margin-bottom: 10px;
+            display: block;
+        }
+        ul {
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .flow-diagram {
+            background-color: #fcf3cf;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-family: "Courier New", monospace;
+            font-weight: bold;
+            color: #7d6608;
+            margin: 30px 0;
+            border: 1px dashed #f1c40f;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #eee;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f6f7;
+            color: #2c3e50;
+        }
+        .model-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            margin-right: 5px;
+        }
+        .tag-prophet { background-color: #3498db; }
+        .tag-arima { background-color: #9b59b6; }
+        .tag-xgb { background-color: #e67e22; }
+        .tag-ensemble { background-color: #34495e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>算法模块“竞技场”机制逻辑汇报</h1>
+        
+        <p>我们的核心预测引擎采用了一种<strong>“赛马机制（Model Arena）”</strong>。简单来说，对于每一个 SPU，我们不迷信单一算法，而是让多个模型“同台竞技”，谁在验证集上跑得最准，就选用谁来预测未来。</p>
+
+        <div class="flow-diagram">
+            输入历史数据 &rarr; 🏃‍♂️ 多模型同时开跑 &rarr; 🎯 验证集PK误差 &rarr; 🏆 胜者全拿 (Winner Takes All)
+        </div>
+
+        <h2>一、 参赛选手 (The Models)</h2>
+        <p>我们派出了风格迥异的四位选手，确保能应对不同类型的销售曲线：</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>选手名称</th>
+                    <th>擅长领域</th>
+                    <th>特点</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="model-tag tag-prophet">Prophet</span> <strong>(Facebook先知)</strong></td>
+                    <td>趋势与节假日</td>
+                    <td>擅长捕捉长期增长/下降趋势，对春节、黑五等节假日效应非常敏感。</td>
+                </tr>
+                <tr>
+                    <td><span class="model-tag tag-arima">ARIMA</span> <strong>(经典统计)</strong></td>
+                    <td>周期性波动</td>
+                    <td>数学功底深厚，擅长捕捉数据的自相关性（如“这周销量跟上周有关”）。</td>
+                </tr>
+                <tr>
+                    <td><span class="model-tag tag-xgb">XGBoost</span> <strong>(机器学习)</strong></td>
+                    <td>非线性复杂特征</td>
+                    <td>暴力美学，擅长从历史销量中挖掘出人眼看不出的复杂规律。</td>
+                </tr>
+                <tr>
+                    <td><span class="model-tag tag-ensemble">Ensemble</span> <strong>(加权融合)</strong></td>
+                    <td>稳健保底</td>
+                    <td>集众家之长，将上述模型的预测结果加权平均，通常最稳，不易大起大落。</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h2>二、 比赛规则 (The Rules)</h2>
+        <p>为了公平起见，我们制定了严格的比赛流程：</p>
+
+        <div class="step-box">
+            <span class="step-title">第一步：切分赛道 (Train/Test Split)</span>
+            我们将历史数据切分为两部分：
+            <ul>
+                <li><strong>训练集 (Training Set)</strong>：比如过去 3 年的数据，用来“训练”模型。</li>
+                <li><strong>验证集 (Validation Set)</strong>：最近 4~10 周的数据，用来“考试”。模型必须预测这段时间，并与真实发生的销量对比。</li>
+            </ul>
+        </div>
+
+        <div class="step-box">
+            <span class="step-title">第二步：实战 PK (Backtesting)</span>
+            所有模型在训练集上学习后，分别预测验证集那 4~10 周的销量。
+            <br><br>
+            <strong>裁判标准</strong>：<span class="highlight">WMAPE (加权平均绝对百分比误差)</span>
+            <br>
+            <em>公式通俗版：(预测值 - 真实值) 的总绝对差 ÷ 真实总销量</em>
+            <br>
+            误差越小，得分越高。
+        </div>
+
+        <div class="step-box">
+            <span class="step-title">第三步：选出冠军 (Selection)</span>
+            系统自动比较各模型的 WMAPE：
+            <ul>
+                <li>如果 Prophet 误差 15%，XGBoost 误差 8% &rarr; <strong>XGBoost 胜出</strong>。</li>
+                <li><strong>最终输出</strong>：仅采用冠军模型的预测结果作为该 SPU 未来的建议备货量。</li>
+            </ul>
+        </div>
+
+        <h2>三、 为什么这么做？ (Why This Works)</h2>
+        <ul>
+            <li><strong>因地制宜</strong>：有的品是季节性的（泳衣），有的品是爆发性的（网红款），单一模型无法通吃。竞技场机制保证了“每个品都用最适合它的模型”。</li>
+            <li><strong>自动进化</strong>：如果某个月市场风向变了（例如从线性增长变成周期波动），在下一次跑数时，擅长周期的 ARIMA 可能会击败 Prophet 成为新冠军，系统自动适应变化。</li>
+            <li><strong>防止过拟合</strong>：通过验证集（Test Set）的强制回测，避免了模型“死记硬背”历史数据。</li>
+        </ul>
+
+        <div class="box" style="background-color: #f0fdf4; border-left: 4px solid #2ecc71; padding: 15px; margin-top: 30px;">
+            <strong>总结：</strong> 这套逻辑就像是一个<strong>“全自动的选品算法经理”</strong>，每周不知疲倦地为几千个 SPU 进行数千次模拟测算，只为给业务端提供一个最靠谱的数字。
+        </div>
+    </div>
+</body>
+</html>

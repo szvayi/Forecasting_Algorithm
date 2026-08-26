@@ -1,0 +1,24 @@
+[Unit]
+Description=Forecast Dashboard V2 API
+After=network.target
+Wants=network-online.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/forecasting_app/current
+EnvironmentFile=/etc/forecasting_app.env
+Environment=PYTHONUNBUFFERED=1
+Environment=FORECAST_INTERNAL_SCHEDULER_ENABLED=false
+ExecStart=/opt/forecasting_app/venv/bin/python -m uvicorn src.api.app:app --host 0.0.0.0 --port 8000
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=60
+TimeoutStopSec=30
+KillMode=mixed
+StandardOutput=append:/var/log/forecast-dashboard-v2.log
+StandardError=append:/var/log/forecast-dashboard-v2.log
+
+[Install]
+WantedBy=multi-user.target
