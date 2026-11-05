@@ -5,7 +5,7 @@ import os
 import datetime
 from src.forecasting.main import get_data_from_db, process_single_spu, save_to_database
 
-DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
 
 print("Starting test...")
 

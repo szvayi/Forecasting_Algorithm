@@ -27,7 +27,7 @@ with open('test_output.txt', 'w', encoding='utf-8') as f:
     # 测试执行
     print("\n测试执行 get_data_from_db...")
     try:
-        db_url = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+        db_url = os.getenv("SALES_FORECAST_DB_URL")
         print(f"使用数据库URL: {db_url}")
         df = get_data_from_db(db_url)
         print(f"✓ 成功获取数据，共 {len(df)} 条")

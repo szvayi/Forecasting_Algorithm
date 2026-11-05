@@ -15,7 +15,7 @@ def main():
     print("=" * 70)
     
     # 从环境变量获取数据库URL
-    DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
     
     print(f"\n🔗 数据库URL: {DB_URL}")
     

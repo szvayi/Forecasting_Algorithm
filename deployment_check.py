@@ -50,7 +50,7 @@ def check_environment_variables():
             print(f"⚠️  {var} 未设置，将使用默认值")
     
     # 检查默认值
-    db_url = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    db_url = os.getenv("SALES_FORECAST_DB_URL")
     sku_threshold = os.getenv("SKU_ACCURACY_THRESHOLD", "0.01")
     
     print(f"\n使用的配置:")
@@ -64,7 +64,7 @@ def check_database_connection():
     print("=" * 80)
     print("检查数据库连接...")
     
-    db_url = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    db_url = os.getenv("SALES_FORECAST_DB_URL")
     
     try:
         engine = create_engine(db_url, pool_pre_ping=True)

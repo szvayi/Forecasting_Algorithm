@@ -3052,7 +3052,7 @@ def main():
 
     ENABLE_DB_WRITE = True
     # 建议：把数据库连接串放到环境变量 `SALES_FORECAST_DB_URL`，避免在代码里硬编码账号密码
-    DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/postgres")
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
     DB_TABLE = "sales_forecast_history"
     # ==============================
 

@@ -306,7 +306,9 @@ def main():
     SHOW_PLOTS      = False
     SAVE_PLOTS      = False
     ENABLE_DB_WRITE = True
-    DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
+    if not DB_URL:
+        raise RuntimeError("缺少环境变量 SALES_FORECAST_DB_URL，参见 ENV.md")
 
     print("=" * 70)
     print("SPU 销售预测引擎 v8.4 (SPU+SKU 联合可视化版)")
@@ -385,7 +387,9 @@ def test_forecast():
     print("当前时间:", datetime.datetime.now())
     
     # 测试数据库连接
-    DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
+    if not DB_URL:
+        raise RuntimeError("缺少环境变量 SALES_FORECAST_DB_URL，参见 ENV.md")
     print("数据库URL:", DB_URL)
     
     try:

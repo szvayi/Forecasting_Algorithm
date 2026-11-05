@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.insert(0, '.')
 
@@ -8,7 +9,7 @@ import numpy as np
 from src.forecasting.predictors import run_prophet, run_xgboost, run_lightgbm, run_all_models
 from src.forecasting.models import SPUProfiler
 
-DB_URL = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
 
 # 从数据库加载一个SPU的数据
 print("从数据库加载SPU 2141的数据...")

@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
@@ -8,7 +9,9 @@ from sqlalchemy import create_engine, text
 def check_db_connection():
     """检查数据库连接"""
     print("🔄 检查数据库连接...")
-    db_url = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+    db_url = os.getenv("SALES_FORECAST_DB_URL")
+if not db_url:
+    raise RuntimeError("缺少环境变量 SALES_FORECAST_DB_URL，参见 ENV.md")
     
     try:
         engine = create_engine(db_url, pool_pre_ping=True)
@@ -25,7 +28,7 @@ def check_db_connection():
 def check_table_exists():
     """检查表是否存在"""
     print("🔄 检查表是否存在...")
-    db_url = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+    db_url = os.getenv("SALES_FORECAST_DB_URL")
     
     try:
         engine = create_engine(db_url)
@@ -53,7 +56,7 @@ def check_table_exists():
 def check_record_count():
     """检查记录数"""
     print("🔄 检查记录数...")
-    db_url = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+    db_url = os.getenv("SALES_FORECAST_DB_URL")
     
     try:
         engine = create_engine(db_url)

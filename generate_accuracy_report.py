@@ -653,7 +653,7 @@ def main():
     print("=" * 70)
     
     # 数据库连接
-    DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
     
     # 获取预测数据
     forecast_df = get_forecast_data(DB_URL)

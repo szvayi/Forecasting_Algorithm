@@ -5,9 +5,11 @@
 import os
 from sqlalchemy import create_engine, text
 
-DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
+if not DB_URL:
+    raise RuntimeError("缺少环境变量 SALES_FORECAST_DB_URL，参见 ENV.md")
 
-print("数据库URL:", DB_URL)
+print("数据库主机:", (DB_URL.split("@")[-1] if DB_URL and "@" in DB_URL else DB_URL))
 
 engine = create_engine(DB_URL, pool_pre_ping=True)
 

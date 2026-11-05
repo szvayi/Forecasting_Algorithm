@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
@@ -8,7 +9,7 @@ import pandas as pd
 from sqlalchemy import create_engine, text
 
 # 数据库URL
-db_url = 'postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink'
+os.getenv("SALES_FORECAST_DB_URL")
 
 print("=" * 80)
 print("📊 数据库记录统计")

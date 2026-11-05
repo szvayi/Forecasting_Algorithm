@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.insert(0, '.')
 
@@ -9,7 +10,9 @@ from sqlalchemy import create_engine, text
 import warnings
 warnings.filterwarnings('ignore')
 
-DB_URL = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
+if not DB_URL:
+    raise RuntimeError("缺少环境变量 SALES_FORECAST_DB_URL，参见 ENV.md")
 
 # 从数据库加载SPU 2141的数据
 print("从数据库加载SPU 2141的数据...")

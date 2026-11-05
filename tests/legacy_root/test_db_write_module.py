@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from main import save_to_database
 
 # 数据库URL
-DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
 
 print("=" * 80)
 print("🧪 测试数据库写入模块")

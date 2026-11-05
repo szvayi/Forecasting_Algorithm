@@ -16,10 +16,9 @@ from src.database.repositories import get_database_engine, query_forecast_result
 
 
 def main() -> None:
-    db_url = os.getenv(
-        "SALES_FORECAST_DB_URL",
-        "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink",
-    )
+    db_url = os.getenv("SALES_FORECAST_DB_URL")
+    if not db_url:
+        raise RuntimeError("缺少环境变量 SALES_FORECAST_DB_URL，参见 ENV.md")
 
     engine = get_database_engine(db_url)
     try:

@@ -1,8 +1,11 @@
+import os
 from sqlalchemy import create_engine, text
 import datetime
 
 # 数据库连接URL
-DB_URL = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
+if not DB_URL:
+    raise RuntimeError("缺少环境变量 SALES_FORECAST_DB_URL，参见 ENV.md")
 
 def check_db_data():
     try:
