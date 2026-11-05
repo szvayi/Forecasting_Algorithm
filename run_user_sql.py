@@ -133,7 +133,7 @@ def run_user_sql():
     print("🚀 用户SQL版本预测系统")
     print("=" * 80)
     
-    DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
     
     print(f"📅 执行时间: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     print(f"🗄️ 数据库URL: {DB_URL}")

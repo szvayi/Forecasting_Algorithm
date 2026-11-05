@@ -4,7 +4,7 @@ import json
 import numpy as np
 from sqlalchemy import create_engine, text
 
-DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
 
 print("研究SKU权重改进方案...")
 

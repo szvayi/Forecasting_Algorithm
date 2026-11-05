@@ -17,7 +17,7 @@ try:
     
     # 尝试执行get_data_from_db
     print("尝试连接数据库...")
-    DB_URL = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
     df = get_data_from_db(DB_URL)
     print(f"数据库连接成功，获取到 {len(df)} 条数据")
     

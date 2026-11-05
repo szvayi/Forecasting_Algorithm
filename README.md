@@ -29,7 +29,7 @@
 ## 关键配置
 
 - **API服务**：运行在 `http://localhost:8000`
-- **数据库URL**：从环境变量 `SALES_FORECAST_DB_URL` 获取，默认值为 `postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink`
+- **数据库URL**：必填环境变量 `SALES_FORECAST_DB_URL`（详见 ENV.md）；代码内不再提供默认密码
 - **SPU评估阈值**：从环境变量 `SKU_ACCURACY_THRESHOLD` 获取，默认值为 0.01
 
 ## 如何运行

@@ -1,3 +1,4 @@
+import os
 import sys
 sys.path.insert(0, '.')
 
@@ -8,7 +9,7 @@ import numpy as np
 from src.forecasting.main import get_data_from_db
 from src.forecasting.models import FeatureEngineer
 
-DB_URL = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
 
 # 从数据库获取数据
 data, spu_list = get_data_from_db(DB_URL)

@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # 获取数据库连接URL
-DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
 print(f"数据库连接URL: {DB_URL}")
 
 # 测试数据库连接

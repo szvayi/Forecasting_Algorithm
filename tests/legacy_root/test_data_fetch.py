@@ -16,7 +16,7 @@ print("🔄 测试数据库数据拉取...")
 
 try:
     # 数据库连接信息
-    DB_URL = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
     print(f"数据库URL: {DB_URL}")
     
     # 测试数据库连接

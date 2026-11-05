@@ -27,7 +27,7 @@ def test_new_features():
     print("=" * 70)
     
     # 从环境变量获取数据库URL
-    DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
     
     # 1. 测试增强日志记录器
     print("\n1️⃣ 测试增强日志记录器...")
@@ -152,7 +152,7 @@ def test_with_sample_data():
     print("=" * 70)
     
     # 从环境变量获取数据库URL
-    DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
     
     # 创建示例数据
     dates = pd.date_range('2026-01-01', periods=100, freq='W')

@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 import json
@@ -9,7 +10,7 @@ print("=== 测试单个SPU的SKU回测功能 ===")
 # 获取数据
 try:
     print("1. 获取数据...")
-    df_all = get_data_from_db("postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    df_all = get_data_from_db(os.getenv("SALES_FORECAST_DB_URL"))
     print(f"   数据加载完成，共 {len(df_all)} 行")
     print(f"   唯一SPU数量: {len(df_all['spu'].unique())}")
     

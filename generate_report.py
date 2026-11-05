@@ -3,7 +3,7 @@ import pandas as pd
 import json
 from sqlalchemy import create_engine, text
 
-DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
 DESKTOP_PATH = os.path.join(os.path.expanduser("~"), "Desktop")
 
 print("生成预测效果HTML报告...")

@@ -414,7 +414,9 @@ def main():
     SHOW_PLOTS      = True
     SAVE_PLOTS      = True
     ENABLE_DB_WRITE = True
-    DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
+    if not DB_URL:
+        raise RuntimeError("缺少环境变量 SALES_FORECAST_DB_URL，参见 ENV.md")
     
     # --- Configurable Parameters ---
     SKU_ACCURACY_THRESHOLD = float(os.getenv("SKU_ACCURACY_THRESHOLD", 0.01)) # Filter SKUs with sales < 1% of SPU total

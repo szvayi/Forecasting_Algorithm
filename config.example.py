@@ -1,24 +1,23 @@
-# repair_package_v1_2_fix/config.example.py
-# This file serves as an example. It's recommended to use environment variables
-# for sensitive information in production, or a dedicated config management system.
+# Example configuration. Copy values into the server environment / .env
+# (see ENV.md and .env.example). Do not commit real credentials.
 
-# Flask application configuration
-# Debug mode should be False in production
+import os
+
+# Flask / app host settings (legacy example)
 DEBUG = True
 HOST = "0.0.0.0"
 PORT = 5000
 
-# Database connection URL (example, replace with your actual DB)
-# E.g., "postgresql://user:password@host:port/dbname"
-DATABASE_URL="postgresql+psycopg2://ai_reader:ai_reader_pwd@192.168.1.226:5432/finedatalink"
+# Prefer SALES_FORECAST_DB_URL for the forecasting platform.
+# DATABASE_URL is an accepted alias used by some NexusBI / monitor modules.
+DATABASE_URL = os.getenv(
+    "DATABASE_URL",
+    "postgresql+psycopg2://USER:PASSWORD@HOST:5432/finedatalink",
+)
+SALES_FORECAST_DB_URL = os.getenv(
+    "SALES_FORECAST_DB_URL",
+    DATABASE_URL,
+)
 
-# API Key for your LLM service (e.g., DeepSeek, OpenAI, Gemini)
-# IMPORTANT: DO NOT hardcode sensitive API keys directly in production code.
-# Use environment variables or a secure secret management system.
+# LLM / external APIs — never commit real keys
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "REPLACE_WITH_YOUR_API_KEY")
-
-# Add other configuration parameters here as needed
-# For example, logging level, external service URLs, etc.
-# LOG_LEVEL = "INFO"
-
-

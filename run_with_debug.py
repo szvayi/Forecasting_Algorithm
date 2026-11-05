@@ -22,7 +22,7 @@ def run_with_debug():
     print(f"📁 当前目录: {os.getcwd()}")
     
     # 检查环境变量
-    db_url = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    db_url = os.getenv("SALES_FORECAST_DB_URL")
     print(f"🗄️ 数据库URL: {db_url}")
     
     # 检查必要的模块

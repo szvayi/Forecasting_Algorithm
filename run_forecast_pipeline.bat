@@ -1,10 +1,15 @@
 @echo off
 setlocal
 
+if not defined SALES_FORECAST_DB_URL (
+  echo [ERROR] Set SALES_FORECAST_DB_URL first. See ENV.md
+  exit /b 1
+)
+
 :: --- Configuration ---
 set PROJ_DIR=C:\Users\VY0814\Forecasting_Algorithm
 set VENV_PYTHON=%PROJ_DIR%\.venv\Scripts\python.exe
-set DB_URL=postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink
+set DB_URL=%SALES_FORECAST_DB_URL%
 set SPU_LIST=0887,0779,0849,0855
 set PYTHONIOENCODING=utf-8
 

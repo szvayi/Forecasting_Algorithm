@@ -430,7 +430,7 @@ def run_analysis_with_progress(mode='smart', db_url=None):
     _analysis_state["status"] = "running"
     
     if db_url is None:
-        db_url = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+        db_url = os.getenv("SALES_FORECAST_DB_URL")
     
     log_message(f"=" * 70, "info")
     log_message(f"SPU 销售预测引擎 v8.5 (前端测试版)", "info")

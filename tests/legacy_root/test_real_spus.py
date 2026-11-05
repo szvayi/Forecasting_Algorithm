@@ -27,7 +27,7 @@ def test_with_real_spus():
     print("=" * 70)
     
     # 从环境变量获取数据库URL
-    DB_URL = os.getenv("SALES_FORECAST_DB_URL", "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink")
+    DB_URL = os.getenv("SALES_FORECAST_DB_URL")
     
     # 创建数据库引擎
     engine = create_engine(DB_URL, pool_pre_ping=True)

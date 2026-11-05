@@ -12,7 +12,7 @@ print("Testing lx_ods table...")
 # 测试 lx_ods 表
 import psycopg2
 
-DB_URL = "postgresql+psycopg2://postgres:vayiERty123@192.168.1.226:5432/finedatalink"
+DB_URL = os.getenv("SALES_FORECAST_DB_URL")
 
 print(f"Database URL: {DB_URL}")
 
